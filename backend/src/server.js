@@ -9,6 +9,7 @@ import { clerkMiddleware } from '@clerk/express'
 import chatRoutes from "./routes/chatRoutes.js";
 import sessionRoutes from "./routes/sessionRoutes.js";
 import codeRoutes from "./routes/codeRoutes.js";
+// import { startSessionCleanup } from "./lib/sessionCleanup.js";
 
 const app = express();
 
@@ -27,10 +28,13 @@ app.use("/api/chat", chatRoutes)
 app.use("/api/sessions", sessionRoutes)
 app.use("/api/code", codeRoutes)
 
-app.get("/hey", (req, res) => {
+app.get("/", (req, res) => {
   res.send("Hello, HireVerse Backend!");
 });
 
+app.get("/api/test", (req, res) => {
+  res.json({ message: "API test works" });
+});
 
 
 //  make our app ready for deployment
@@ -45,6 +49,7 @@ if (ENV.NODE_ENV === "production") {
 const startServer = async () => {
   try {
     await connectDB();
+    // startSessionCleanup();
     app.listen(ENV.PORT, () => {
       console.log("Server is running on", ENV.PORT);
     });
