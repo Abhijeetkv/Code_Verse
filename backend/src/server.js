@@ -18,7 +18,28 @@ const __dirname = Path.resolve();
 // middleware
 app.use(express.json());
 // credentials:true means ?? => server allows a browser to include cookies on request
-app.use(cors({origin:ENV.CLIENT_URL, credentials:true}));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (Postman, curl, mobile apps)
+      if (!origin) return callback(null, true);
+
+      const allowedOrigins = [
+        "https://hire-verse-ui25.vercel.app",
+      ];
+
+      if (
+        allowedOrigins.includes(origin) ||
+        origin.endsWith(".vercel.app")
+      ) {
+        return callback(null, true);
+      }
+
+      callback(new Error(`CORS blocked for origin: ${origin}`));
+    },
+    credentials: true,
+  })
+);
 
 app.use(clerkMiddleware())
 
