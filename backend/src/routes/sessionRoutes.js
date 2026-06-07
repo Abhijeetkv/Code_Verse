@@ -13,12 +13,9 @@ import {
 const router = express.Router();
 
 router.post("/", protectedRoute, createSession);
-router.get("/active", getActiveSessions);
+router.get("/active", protectedRoute, getActiveSessions);
 router.get("/my-recent", protectedRoute, getMyRecentSessions);
 
-router.get("/test", (req, res) => {
-  res.json({ message: "session routes working" });
-});
 
 router.get("/:id", protectedRoute, getSessionById);
 router.post("/:id/join", protectedRoute, joinSession);
