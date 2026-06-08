@@ -13,7 +13,7 @@ const sessionSchema = new mongoose.Schema({
     host: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        required: true
+        default: null
     },
     participant: {
         type: mongoose.Schema.Types.ObjectId,
@@ -28,6 +28,10 @@ const sessionSchema = new mongoose.Schema({
     callId: {
         type: String,
         default: ""
+    },
+    lastActivity: {
+        type: Date,
+        default: Date.now
     }
 
 }, {timestamps: true});

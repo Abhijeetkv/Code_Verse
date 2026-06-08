@@ -5,9 +5,8 @@ export const protectedRoute = [
   requireAuth(),
   async (req, res, next) => {
     try {
-      console.log("Auth object:", req.auth);
-
-      const clerkId = req.auth?.userId;
+      const auth = req.auth();
+      const clerkId = auth?.userId;
 
       if (!clerkId) {
         return res.status(401).json({
@@ -16,13 +15,9 @@ export const protectedRoute = [
         });
       }
 
-      console.log("Clerk ID:", clerkId);
-
       const user = await User.findOne({ clerkId });
 
       if (!user) {
-        console.log("User not found in DB for Clerk ID:", clerkId);
-
         return res.status(404).json({
           success: false,
           message: "User not found",
@@ -40,4 +35,4 @@ export const protectedRoute = [
       });
     }
   },
-];
+];

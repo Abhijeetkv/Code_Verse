@@ -9,7 +9,7 @@ import { clerkMiddleware } from '@clerk/express'
 import chatRoutes from "./routes/chatRoutes.js";
 import sessionRoutes from "./routes/sessionRoutes.js";
 import codeRoutes from "./routes/codeRoutes.js";
-// import { startSessionCleanup } from "./lib/sessionCleanup.js";
+import { startSessionCleanup } from "./lib/sessionCleanup.js";
 
 const app = express();
 
@@ -17,27 +17,29 @@ const __dirname = Path.resolve();
 
 // middleware
 app.use(express.json());
-// credentials:true means ?? => server allows a browser to include cookies on request
+
+// CORS configuration - supports comma-separated CLIENT_URL for multiple origins
+const allowedOrigins = (ENV.CLIENT_URL || "")
+  .split(",")
+  .map((url) => url.trim().replace(/\/+$/, "")) // strip trailing slashes
+  .filter(Boolean);
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (Postman, curl, mobile apps)
+      // Allow requests with no origin (e.g., mobile apps, server-to-server, Inngest)
       if (!origin) return callback(null, true);
 
-      const allowedOrigins = [
-        "https://hire-verse-ui25.vercel.app",
-      ];
-
-      if (
-        allowedOrigins.includes(origin) ||
-        origin.endsWith(".vercel.app")
-      ) {
+      if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
 
-      callback(new Error(`CORS blocked for origin: ${origin}`));
+      console.warn(`CORS blocked origin: ${origin}`);
+      return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -70,7 +72,7 @@ if (ENV.NODE_ENV === "production") {
 const startServer = async () => {
   try {
     await connectDB();
-    // startSessionCleanup();
+    startSessionCleanup();
     app.listen(ENV.PORT, () => {
       console.log("Server is running on", ENV.PORT);
     });

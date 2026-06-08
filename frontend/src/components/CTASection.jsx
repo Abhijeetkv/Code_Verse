@@ -5,17 +5,18 @@ import { ArrowRight } from "lucide-react";
 const CTASection = () => {
   return (
     <section className="py-24 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0c0c14] via-[#111118] to-[#0c0c14]"></div>
+      <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, var(--slate-950), var(--slate-900), var(--slate-950))' }}></div>
       <div className="absolute inset-0" style={{
-        background: "radial-gradient(ellipse 80% 60% at 50% 50%, rgba(99, 102, 241, 0.08), transparent)"
+        background: "radial-gradient(ellipse 80% 60% at 50% 50%, rgba(255, 161, 22, 0.06), transparent)"
       }}></div>
 
       <div className="relative max-w-3xl mx-auto px-6 text-center">
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-5">
-          Ready to transform your technical hiring?
+          Ready to code with a partner?
         </h2>
-        <p className="text-lg text-[#9898a8] mb-10 max-w-xl mx-auto">
-          Join companies using HireVerse to find, test, and hire the best developers faster.
+        <p className="text-lg mb-10 max-w-xl mx-auto" style={{ color: 'var(--slate-400)' }}>
+          Join HireVerse and start solving problems together. 
+          Practice DSA, join live sessions, and level up your skills — for free.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -35,13 +36,10 @@ const CTASection = () => {
               </button>
             </Link>
           </SignedIn>
-          <button className="btn-ghost px-8 py-3.5 text-base">
-            Talk to Us
-          </button>
         </div>
 
-        <p className="text-sm text-[#6b6b7b] mt-8">
-          Free for small teams. No credit card required.
+        <p className="text-sm mt-8" style={{ color: 'var(--slate-500)' }}>
+          No credit card required. Start coding in seconds.
         </p>
       </div>
     </section>

@@ -1,13 +1,14 @@
 import { useUser } from "@clerk/clerk-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { useEndSession, useJoinSession, useSessionById } from "../hooks/useSessions";
+import { useEndSession, useJoinSession, useLeaveSession, useSessionById } from "../hooks/useSessions";
 import { PROBLEMS } from "../data/problem";
 import { executeCode } from "../lib/piston";
+import { sessionApi } from "../api/session";
 import DashNavbar from "../components/DashNavbar";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { getDifficultyBadgeClass } from "../lib/utils";
-import { Loader2Icon, LogOutIcon, PhoneOffIcon } from "lucide-react";
+import { Loader2Icon, LogOutIcon, PhoneOffIcon, DoorOpenIcon } from "lucide-react";
 import CodeEditorPanel from "../components/CodeEditor";
 import OutputPanel from "../components/OutputPanel";
 
@@ -27,6 +28,7 @@ const SessionPage = () => {
 
   const joinSessionMutation = useJoinSession();
   const endSessionMutation = useEndSession();
+  const leaveSessionMutation = useLeaveSession();
 
   const session = sessionData?.session;
   const isHost = session?.host?.clerkId === user?.id;
@@ -57,12 +59,61 @@ const SessionPage = () => {
     // remove the joinSessionMutation, refetch from dependencies to avoid infinite loop
   }, [session, user, loadingSession, isHost, isParticipant, id]);
 
+  // send heartbeat every 60s to keep session alive
+  useEffect(() => {
+    if (!session || !id || session.status !== "active") return;
+    if (!isHost && !isParticipant) return;
+
+    // Send immediately on mount
+    sessionApi.heartbeat(id).catch(() => {});
+
+    const interval = setInterval(() => {
+      sessionApi.heartbeat(id).catch(() => {});
+    }, 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, [id, session?.status, isHost, isParticipant]);
+
   // redirect the "participant" when session ends
   useEffect(() => {
     if (!session || loadingSession) return;
 
     if (session.status === "completed") navigate("/dashboard");
   }, [session, loadingSession, navigate]);
+
+  // Auto-leave session on tab close or navigating away
+  useEffect(() => {
+    if (!session || !id || session.status !== "active") return;
+    if (!isHost && !isParticipant) return;
+
+    // Track whether we already left (avoid double-leave from beforeunload + unmount)
+    let hasLeft = false;
+
+    const handleBeforeUnload = () => {
+      if (hasLeft) return;
+      hasLeft = true;
+      // Use fetch with keepalive for reliable delivery on tab close
+      // Clerk session cookie is sent automatically via credentials: "include"
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
+      fetch(`${baseUrl}/sessions/${id}/leave`, {
+        method: "POST",
+        keepalive: true,
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      }).catch(() => {});
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      // On React unmount (navigating away within the app), call leave
+      if (!hasLeft) {
+        hasLeft = true;
+        sessionApi.leaveSession(id).catch(() => {});
+      }
+    };
+  }, [id, session?.status, isHost, isParticipant]);
 
   // update code when problem loads or changes
   useEffect(() => {
@@ -91,8 +142,13 @@ const SessionPage = () => {
 
   const handleEndSession = () => {
     if (confirm("Are you sure you want to end this session? All participants will be notified.")) {
-      // this will navigate the HOST to dashboard
       endSessionMutation.mutate(id, { onSuccess: () => navigate("/dashboard") });
+    }
+  };
+
+  const handleLeaveSession = () => {
+    if (confirm("Are you sure you want to leave this session?")) {
+      leaveSessionMutation.mutate(id, { onSuccess: () => navigate("/dashboard") });
     }
   };
 
@@ -145,6 +201,20 @@ const SessionPage = () => {
                               <LogOutIcon className="w-4 h-4" />
                             )}
                             End Session
+                          </button>
+                        )}
+                        {!isHost && isParticipant && session?.status === "active" && (
+                          <button
+                            onClick={handleLeaveSession}
+                            disabled={leaveSessionMutation.isPending}
+                            className="btn btn-warning btn-sm gap-2"
+                          >
+                            {leaveSessionMutation.isPending ? (
+                              <Loader2Icon className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <DoorOpenIcon className="w-4 h-4" />
+                            )}
+                            Leave Session
                           </button>
                         )}
                         {session?.status === "completed" && (

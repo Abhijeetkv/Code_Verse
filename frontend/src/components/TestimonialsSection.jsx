@@ -3,25 +3,25 @@ import { Star } from "lucide-react";
 const TestimonialsSection = () => {
   const testimonials = [
     {
-      quote: "HireVerse cut our time-to-hire in half. The collaborative coding environment is exactly what we needed.",
-      name: "Sarah Chen",
-      role: "VP Engineering",
-      company: "TechFlow",
-      initials: "SC"
+      quote: "HireVerse makes pair programming so easy. I joined a session, solved a problem with a stranger, and learned a new approach — all in 20 minutes.",
+      name: "Arjun Mehta",
+      role: "Full-Stack Developer",
+      company: "",
+      initials: "AM"
     },
     {
-      quote: "Finally, a platform that feels like pair programming. Candidates love it, and so do we.",
-      name: "Marcus Johnson",
-      role: "Engineering Manager",
-      company: "DataScale",
-      initials: "MJ"
+      quote: "The video + code editor combo is seamless. It's like being in the same room. Way better than screen-sharing on Zoom.",
+      name: "Priya Sharma",
+      role: "CS Student",
+      company: "",
+      initials: "PS"
     },
     {
-      quote: "The best technical interview tool we've used. Clean, fast, and the problem library is excellent.",
-      name: "Emily Rodriguez",
-      role: "Head of Talent",
-      company: "CloudNative",
-      initials: "ER"
+      quote: "I use this daily to practice DSA. The streak tracking keeps me motivated, and the live sessions are a game-changer for learning.",
+      name: "Rahul Verma",
+      role: "Software Engineer",
+      company: "",
+      initials: "RV"
     }
   ];
 
@@ -30,9 +30,9 @@ const TestimonialsSection = () => {
       <div className="max-w-6xl mx-auto px-6">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <p className="text-[#6366f1] font-medium text-sm mb-4">TESTIMONIALS</p>
+          <p className="font-medium text-sm mb-4" style={{ color: 'var(--indigo-500)' }}>TESTIMONIALS</p>
           <h2 className="text-3xl sm:text-4xl font-bold text-white">
-            Trusted by engineering teams
+            Loved by developers
           </h2>
         </div>
 
@@ -43,12 +43,12 @@ const TestimonialsSection = () => {
               {/* Stars */}
               <div className="flex gap-1 mb-4">
                 {[...Array(5)].map((_, j) => (
-                  <Star key={j} className="w-4 h-4 fill-[#fbbf24] text-[#fbbf24]" />
+                  <Star key={j} className="w-4 h-4" style={{ fill: 'var(--amber)', color: 'var(--amber)' }} />
                 ))}
               </div>
 
               {/* Quote */}
-              <p className="text-[#c4c4d0] leading-relaxed mb-6">
+              <p className="leading-relaxed mb-6" style={{ color: 'var(--slate-200)' }}>
                 "{t.quote}"
               </p>
 
@@ -57,7 +57,7 @@ const TestimonialsSection = () => {
                 <div className="avatar">{t.initials}</div>
                 <div>
                   <div className="font-medium text-white text-sm">{t.name}</div>
-                  <div className="text-[#6b6b7b] text-xs">{t.role}, {t.company}</div>
+                  <div className="text-xs" style={{ color: 'var(--slate-500)' }}>{t.role}</div>
                 </div>
               </div>
             </div>

@@ -10,6 +10,7 @@ import OutputPanel from "../components/OutputPanel.jsx";
 import { executeCode } from "../lib/piston.js";
 import { toast } from "react-hot-toast";
 import confetti from "canvas-confetti";
+import { useProgress } from "../hooks/useProgress.js";
 
 
 const ProblemPage = () => {
@@ -21,6 +22,8 @@ const ProblemPage = () => {
   const [code, setCode] = useState(PROBLEMS[currentProblemId].starterCode.javascript);
   const [output, setOutput] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { markProblemSolved } = useProgress(PROBLEMS);
 
   const currentProblem = PROBLEMS[currentProblemId];
 
@@ -56,7 +59,6 @@ const ProblemPage = () => {
   };
 
   const normalizeOutput = (output) => {
-    // normalize output for comparison (trim whitespace, handle different spacing)
     return output
       .trim()
       .split("\n")
@@ -74,10 +76,10 @@ const ProblemPage = () => {
   const checkIfTestsPassed = (actualOutput, expectedOutput) => {
     const normalizedActual = normalizeOutput(actualOutput);
     const normalizedExpected = normalizeOutput(expectedOutput);
-
     return normalizedActual == normalizedExpected;
   };
 
+  // RUN — just execute, show raw output, no verdict
   const handleRunCode = async () => {
     setIsRunning(true);
     setOutput(null);
@@ -85,7 +87,14 @@ const ProblemPage = () => {
     const result = await executeCode(selectedLanguage, code);
     setOutput(result);
     setIsRunning(false);
+  };
 
+  // SUBMIT — execute, check against expected output, mark solved
+  const handleSubmitCode = async () => {
+    setIsSubmitting(true);
+    setOutput(null);
+
+    const result = await executeCode(selectedLanguage, code);
 
     if (result.success) {
       const expectedOutput = currentProblem.expectedOutput[selectedLanguage];
@@ -93,18 +102,34 @@ const ProblemPage = () => {
 
       if (testsPassed) {
         triggerConfetti();
-        toast.success("All tests passed! Great job!");
+        markProblemSolved(currentProblemId);
+        toast.success("Accepted! All tests passed 🎉");
+        setOutput({
+          ...result,
+          verdict: "accepted",
+        });
       } else {
-        toast.error("Tests failed. Check your output!");
+        toast.error("Wrong Answer — check your solution");
+        setOutput({
+          ...result,
+          verdict: "wrong",
+          expectedOutput: expectedOutput,
+        });
       }
     } else {
-      toast.error("Code execution failed!");
+      toast.error("Compilation/Runtime Error");
+      setOutput({
+        ...result,
+        verdict: "error",
+      });
     }
+
+    setIsSubmitting(false);
   };
 
   return (
     <>
-    <div className="h-screen bg-base-100 flex flex-col">
+    <div className="h-screen flex flex-col" style={{ background: 'var(--slate-950)' }}>
       <DashNavbar />
 
       <div className="flex-1 min-h-screen">
@@ -118,7 +143,7 @@ const ProblemPage = () => {
             />
           </Panel>
 
-          <PanelResizeHandle className="w-2 bg-base-300 hover:bg-primary transition-colors cursor-col-resize" />
+          <PanelResizeHandle className="resize-handle-h" />
 
           <Panel defaultSize={60} minSize={30}>
             <PanelGroup direction="vertical">
@@ -127,13 +152,15 @@ const ProblemPage = () => {
                   selectedLanguage={selectedLanguage}
                   code={code}
                   isRunning={isRunning}
+                  isSubmitting={isSubmitting}
                   onLanguageChange={handleLanguageChange}
                   onCodeChange={setCode}
                   onRunCode={handleRunCode}
+                  onSubmitCode={handleSubmitCode}
                 />
               </Panel>
 
-              <PanelResizeHandle className="h-2 bg-base-300 hover:bg-primary transition-colors cursor-row-resize" />
+              <PanelResizeHandle className="resize-handle-v" />
 
 
               <Panel defaultSize={30} minSize={30}>
