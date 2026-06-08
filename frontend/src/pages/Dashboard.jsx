@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import DashNavbar from "../components/DashNavbar";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
-import { useCreateSession, useActiveSessions, useMyRecentSessions } from "../hooks/useSessions";
+import { useCreateSession, useActiveSessions } from "../hooks/useSessions";
+import { useProgress } from "../hooks/useProgress";
+import { PROBLEMS } from "../data/problem.js";
 import WelcomeSection from "../components/WelcomeSection";
 import StatsCards from "../components/StatsCards";
 import ActiveSessions from "../components/ActiveSessions";
-import RecentSessions from "../components/RecentSessions";
+import StreakCalendar from "../components/StreakCalendar";
+import SolvedProgress from "../components/SolvedProgress";
 import CreateSessionModel from "../components/CreateSessionModel";
 
 const Dashboard = () => {
@@ -18,7 +21,21 @@ const Dashboard = () => {
   const createSessionMutation = useCreateSession();
 
   const { data: activeSessionData, isLoading: loadingActiveSessions } = useActiveSessions();
-  const { data: recentSessionsData, isLoading: loadingRecentSessions } = useMyRecentSessions();
+
+  const allProblems = useMemo(() => Object.values(PROBLEMS), []);
+  const { solvedCount, streakData, submissions, getSolvedByDifficulty } = useProgress(PROBLEMS);
+
+  const solvedByDifficulty = getSolvedByDifficulty();
+  const totalByDifficulty = useMemo(() => {
+    let easy = 0, medium = 0, hard = 0;
+    for (const p of allProblems) {
+      const d = p.difficulty?.toLowerCase();
+      if (d === "easy") easy++;
+      else if (d === "medium") medium++;
+      else if (d === "hard") hard++;
+    }
+    return { easy, medium, hard };
+  }, [allProblems]);
 
   const handleCreateRoom = () => {
     if(!roomConfig.problem || !roomConfig.difficulty) return;
@@ -37,7 +54,6 @@ const Dashboard = () => {
   }
 
   const activeSessions = activeSessionData?.sessions || []
-  const recentSessions = recentSessionsData?.sessions || []
 
   const isUserInSession = (session) => {
     if (!user.id) return false;
@@ -47,29 +63,45 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-linear-to-b from-gray-100 to-gray-400">
+      <div className="min-h-screen" style={{ background: 'var(--slate-950)' }}>
         <DashNavbar />
 
         <WelcomeSection onCreateSession={() => setShowCreateModel(true)} />
 
-          <div className="container max-w-7xl mx-auto px-6 pb-16">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <StatsCards 
-              activeSessionsCount={activeSessions.length}
-              recentSessionsCount={recentSessions.length}
-            />
-            <ActiveSessions
-              sessions={activeSessions}
-              isLoading={loadingActiveSessions}
-              isUserInSession={isUserInSession}
-            />
+        <div className="max-w-7xl mx-auto px-6 pb-16">
+          {/* Row 1: Solved Progress + Streak Calendar */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 fade-up">
+            <div className="lg:col-span-1">
+              <SolvedProgress
+                solvedByDifficulty={solvedByDifficulty}
+                totalByDifficulty={totalByDifficulty}
+              />
+            </div>
+            <div className="lg:col-span-2">
+              <StreakCalendar
+                submissions={submissions}
+                streakData={streakData}
+              />
+            </div>
           </div>
 
-          <RecentSessions
-            sessions={recentSessions}
-            isLoading={loadingRecentSessions}
-          />
+          {/* Row 2: Stats + Active Sessions */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 fade-up delay-1">
+            <div className="lg:col-span-1">
+              <StatsCards 
+                activeSessionsCount={activeSessions.length}
+                solvedCount={solvedCount}
+              />
+            </div>
+            <div className="lg:col-span-3">
+              <ActiveSessions
+                sessions={activeSessions}
+                isLoading={loadingActiveSessions}
+                isUserInSession={isUserInSession}
+              />
+            </div>
           </div>
+        </div>
       </div>
 
       <CreateSessionModel

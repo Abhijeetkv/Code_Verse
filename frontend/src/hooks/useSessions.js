@@ -63,3 +63,13 @@ export const useEndSession = () => {
 
   return result;
 };
+
+export const useLeaveSession = () => {
+  const result = useMutation({
+    mutationKey: ["leaveSession"],
+    mutationFn: sessionApi.leaveSession,
+    onError: (error) => toast.error(error.response?.data?.message || "Failed to leave session"),
+  });
+
+  return result;
+};

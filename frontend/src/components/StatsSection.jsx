@@ -1,13 +1,13 @@
 ;const StatsSection = () => {
   const stats = [
-    { value: "10K+", label: "Companies" },
-    { value: "500K+", label: "Interviews" },
-    { value: "98%", label: "Satisfaction" },
-    { value: "40%", label: "Faster hiring" }
+    { value: "20+", label: "Coding Problems" },
+    { value: "5+", label: "Languages" },
+    { value: "HD", label: "Video Quality" },
+    { value: "∞", label: "Free Sessions" }
   ];
 
   return (
-    <section className="py-16 border-y border-[#18181f]">
+    <section className="py-16" style={{ borderTop: '1px solid var(--slate-800)', borderBottom: '1px solid var(--slate-800)' }}>
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
           {stats.map((stat, i) => (

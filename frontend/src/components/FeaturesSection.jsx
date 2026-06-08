@@ -1,36 +1,36 @@
-import { Video, Code2, BookOpen, BarChart3, Shield, Zap } from "lucide-react";
+import { Video, Code2, BookOpen, Users, MessageSquare, Zap } from "lucide-react";
 
 const FeaturesSection = () => {
   const features = [
     {
-      icon: Video,
-      title: "Crystal-clear video",
-      description: "HD video with ultra-low latency. See every expression, hear every word."
+      icon: Code2,
+      title: "LeetCode-style Problems",
+      description: "Practice with curated DSA challenges across Easy, Medium, and Hard — track your progress and build consistency."
     },
     {
-      icon: Code2,
-      title: "Live code collaboration",
-      description: "Real-time editing with syntax highlighting for 50+ languages."
+      icon: Video,
+      title: "Live Video Sessions",
+      description: "Pair up with another coder over HD video. Discuss approaches, debug together, and learn from each other."
+    },
+    {
+      icon: MessageSquare,
+      title: "Built-in Chat",
+      description: "Real-time messaging in every session. Share links, discuss edge cases, and keep the conversation flowing."
+    },
+    {
+      icon: Users,
+      title: "Collaborative Coding",
+      description: "Shared code editor with syntax highlighting. Both participants see changes instantly — like Google Docs for code."
     },
     {
       icon: BookOpen,
-      title: "Problem library",
-      description: "Curated challenges across all difficulty levels, or create your own."
-    },
-    {
-      icon: BarChart3,
-      title: "Smart insights",
-      description: "AI-powered performance analysis and skill assessments."
-    },
-    {
-      icon: Shield,
-      title: "Enterprise ready",
-      description: "SOC 2 compliant with end-to-end encryption."
+      title: "Multi-language Support",
+      description: "Write solutions in JavaScript, Python, Java, C++, and more. Switch languages anytime with built-in starter code."
     },
     {
       icon: Zap,
-      title: "One-click setup",
-      description: "No downloads. Just share a link and start interviewing."
+      title: "Instant Execution",
+      description: "Run and submit your code in the browser. Get instant feedback — Accepted, Wrong Answer, or Runtime Error."
     }
   ];
 
@@ -39,12 +39,12 @@ const FeaturesSection = () => {
       <div className="max-w-6xl mx-auto px-6">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <p className="text-[#6366f1] font-medium text-sm mb-4">FEATURES</p>
+          <p className="font-medium text-sm mb-4" style={{ color: 'var(--indigo-500)' }}>FEATURES</p>
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-            Everything you need to hire great engineers
+            Everything you need to level up
           </h2>
-          <p className="text-[#9898a8] text-lg">
-            A complete toolkit for modern technical interviews.
+          <p className="text-lg" style={{ color: 'var(--slate-400)' }}>
+            Practice coding, collaborate over video, and grow your skills — all in one place.
           </p>
         </div>
 
@@ -58,7 +58,7 @@ const FeaturesSection = () => {
               <h3 className="text-xl font-semibold text-white mb-2">
                 {feature.title}
               </h3>
-              <p className="text-[#9898a8] leading-relaxed">
+              <p style={{ color: 'var(--slate-400)' }} className="leading-relaxed">
                 {feature.description}
               </p>
             </div>

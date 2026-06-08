@@ -14,6 +14,7 @@ export async function executeCode(language, code) {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify({ language, code }),
     });
 

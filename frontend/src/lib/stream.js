@@ -15,7 +15,7 @@ export const initializeStreamClient = async (user, token) => {
 
   if (!apiKey) throw new Error("Stream API key is not provided.");
 
-  client = new StreamVideoClient({
+  client = StreamVideoClient.getOrCreateInstance({
     apiKey,
     user,
     token,

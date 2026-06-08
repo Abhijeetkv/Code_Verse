@@ -2,6 +2,26 @@ import { chatClient, streamClient } from "../lib/stream.js";
 import Session from "../modals/Session.js";
 import mongoose from "mongoose";
 
+// Helper: destroy a session's Stream resources and delete from DB
+async function destroySessionResources(session) {
+  try {
+    const call = streamClient.video.call("default", session.callId);
+    await call.delete({ hard: true });
+  } catch (err) {
+    console.log("Error deleting Stream call:", err.message);
+  }
+
+  try {
+    const channel = chatClient.channel("messaging", session.callId);
+    await channel.delete();
+  } catch (err) {
+    console.log("Error deleting Stream channel:", err.message);
+  }
+
+  await Session.findByIdAndDelete(session._id);
+  console.log(`[Session] Destroyed session ${session._id} — no users remaining`);
+}
+
 
 export async function createSession(req,res) {
     try {
@@ -127,6 +147,81 @@ export async function joinSession(req,res) {
     }
 }
 
+export async function heartbeat(req,res) {
+    try {
+        const {id} = req.params;
+
+        const session = await Session.findById(id);
+
+        if(!session) {
+            return res.status(404).json({message: "Session not found"});
+        }
+
+        session.lastActivity = new Date();
+        await session.save();
+
+        res.status(200).json({ok: true});
+    } catch (error) {
+        console.log("Error in heartbeat:", error.message);
+        res.status(500).json({message: "Internal server error"});
+    }
+}
+
+export async function leaveSession(req, res) {
+    try {
+        const { id } = req.params;
+        const userId = req.user._id;
+        const clerkId = req.user.clerkId;
+
+        const session = await Session.findById(id);
+
+        if (!session) {
+            return res.status(404).json({ message: "Session not found" });
+        }
+
+        const isHost = session.host && session.host.toString() === userId.toString();
+        const isParticipant = session.participant && session.participant.toString() === userId.toString();
+
+        if (!isHost && !isParticipant) {
+            return res.status(403).json({ message: "You are not part of this session" });
+        }
+
+        // Remove the user from their role
+        if (isHost) {
+            session.host = null;
+        }
+        if (isParticipant) {
+            session.participant = null;
+        }
+
+        // Remove user from Stream chat channel (best-effort)
+        try {
+            const channel = chatClient.channel("messaging", session.callId);
+            await channel.removeMembers([clerkId]);
+        } catch (err) {
+            console.log("Error removing member from channel:", err.message);
+        }
+
+        // Check if anyone is still in the session
+        const hasHost = session.host != null;
+        const hasParticipant = session.participant != null;
+        // If no one is left, the session stays active for 2 minutes
+        // so users can rejoin. The background cleanup job will delete it.
+        if (!hasHost && !hasParticipant) {
+            console.log(`[Session] Session ${session._id} is now empty — will auto-delete in 2 minutes if no one rejoins`);
+        }
+
+        session.lastActivity = new Date();
+        await session.save();
+
+        res.status(200).json({ message: "You left the session", deleted: false, session });
+
+    } catch (error) {
+        console.log("Error leaving session:", error.message);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
+
 export async function endSession(req,res) {
     try {
         const {id} = req.params;
@@ -146,16 +241,10 @@ export async function endSession(req,res) {
             return res.status(400).json({message: "Session is already completed"});
         }
 
-        session.status = "completed";
-        await session.save();
+        // Force-destroy regardless of who's in the session
+        await destroySessionResources(session);
 
-        const call  = streamClient.video.call("default", session.callId)
-        await call.delete({hard: true});
-
-        const channel = chatClient.channel("messaging", session.callId);
-        await channel.delete();
-
-        res.status(200).json({session, message: "Session ended successfully"});
+        res.status(200).json({message: "Session ended and deleted successfully"});
 
     } catch (error) {
         console.log("Error ending session:", error.message);

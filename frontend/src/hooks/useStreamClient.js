@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { StreamChat } from "stream-chat";
 import toast from "react-hot-toast";
 import { initializeStreamClient, disconnectStreamClient } from "../lib/stream";
@@ -11,17 +11,32 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
   const [channel, setChannel] = useState(null);
   const [isInitializingCall, setIsInitializingCall] = useState(true);
 
+  // Track initialization to prevent duplicate calls
+  const isInitializedRef = useRef(false);
+  const isInitializingRef = useRef(false);
+
+  // Use stable primitive values as dependencies instead of the session object
+  const callId = session?.callId;
+  const sessionStatus = session?.status;
+
   useEffect(() => {
+    let cancelled = false;
     let videoCall = null;
     let chatClientInstance = null;
 
     const initCall = async () => {
-      if (!session?.callId) return;
+      if (!callId) return;
       if (!isHost && !isParticipant) return;
-      if (session.status === "completed") return;
+      if (sessionStatus === "completed") return;
+
+      // Prevent duplicate initialization
+      if (isInitializedRef.current || isInitializingRef.current) return;
+      isInitializingRef.current = true;
 
       try {
         const { token, userId, userName, userImage } = await sessionApi.getStreamToken();
+
+        if (cancelled) return;
 
         const client = await initializeStreamClient(
           {
@@ -32,52 +47,73 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
           token
         );
 
+        if (cancelled) return;
+
         setStreamClient(client);
 
-        videoCall = client.call("default", session.callId);
+        videoCall = client.call("default", callId);
         await videoCall.join({ create: true });
+
+        if (cancelled) return;
+
         setCall(videoCall);
 
         const apiKey = import.meta.env.VITE_STREAM_API_KEY;
         chatClientInstance = StreamChat.getInstance(apiKey);
 
-        await chatClientInstance.connectUser(
-          {
-            id: userId,
-            name: userName,
-            image: userImage,
-          },
-          token
-        );
+        // Only connect if not already connected
+        if (!chatClientInstance.userID) {
+          await chatClientInstance.connectUser(
+            {
+              id: userId,
+              name: userName,
+              image: userImage,
+            },
+            token
+          );
+        }
+
+        if (cancelled) return;
+
         setChatClient(chatClientInstance);
 
-        const chatChannel = chatClientInstance.channel("messaging", session.callId);
+        const chatChannel = chatClientInstance.channel("messaging", callId);
         await chatChannel.watch();
         setChannel(chatChannel);
+
+        isInitializedRef.current = true;
       } catch (error) {
-        toast.error("Failed to join video call");
-        console.error("Error init call", error);
+        if (!cancelled) {
+          toast.error("Failed to join video call");
+          console.error("Error init call", error);
+        }
       } finally {
-        setIsInitializingCall(false);
+        isInitializingRef.current = false;
+        if (!cancelled) {
+          setIsInitializingCall(false);
+        }
       }
     };
 
-    if (session && !loadingSession) initCall();
+    if (!loadingSession) initCall();
 
     // cleanup - performance reasons
     return () => {
-      // iife
+      cancelled = true;
       (async () => {
         try {
           if (videoCall) await videoCall.leave();
-          if (chatClientInstance) await chatClientInstance.disconnectUser();
+          if (chatClientInstance?.userID) await chatClientInstance.disconnectUser();
           await disconnectStreamClient();
         } catch (error) {
           console.error("Cleanup error:", error);
+        } finally {
+          isInitializedRef.current = false;
+          isInitializingRef.current = false;
         }
       })();
     };
-  }, [session, loadingSession, isHost, isParticipant]);
+  }, [callId, sessionStatus, loadingSession, isHost, isParticipant]);
 
   return {
     streamClient,
@@ -88,4 +124,4 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
   };
 }
 
-export default useStreamClient;
+export default useStreamClient;

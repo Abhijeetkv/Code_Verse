@@ -4,7 +4,7 @@ import { formatDistanceToNow } from "date-fns";
 
 function RecentSessions({ sessions, isLoading }) {
   return (
-    <div className="card bg-gray-800 hover:border-accent/30 mt-8">
+    <div className="mt-8" style={{ background: 'var(--slate-900)', border: '1px solid var(--slate-800)', borderRadius: '16px' }}>
       <div className="card-body">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 bg-blue-800 rounded-xl">
