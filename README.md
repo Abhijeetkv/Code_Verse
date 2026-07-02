@@ -1,108 +1,105 @@
-# HireVerse
+# CodeVerse
 
-**HireVerse** is a full-stack online interview platform that enables real-time technical interviews with integrated video calls, code editing, and chat — all in one place.
-
----
-
-## ✨ Features
-
-- **🎥 Real-Time Video Calls** — Powered by Stream Video SDK for seamless interviewer-candidate communication
-- **💻 Live Code Editor** — Built-in code editor with multi-language support via Judge0 CE API
-- **💬 In-Session Chat** — Real-time chat during interviews using Stream Chat SDK
-- **📝 DSA Problem Library** — Built-in coding problems with difficulty levels, constraints, and examples
-- **📊 Dashboard** — View active/recent sessions, stats cards, and manage interview rooms
-- **🔐 Authentication** — Secure auth powered by Clerk with middleware-protected routes
-- **⚡ Event-Driven Architecture** — Inngest for background tasks like user sync and cleanup
-- **📱 Resizable Panels** — Flexible session layout with draggable panels for code, video, problems, and chat
+**CodeVerse** is a full-stack, LeetCode-like collaborative coding platform where users can solve DSA problems, write and execute code in multiple languages, and pair-program with others through real-time video calls and chat — all in one place.
 
 ---
 
-## 🛠️ Tech Stack
+## Features
 
-| Layer      | Technology                                                              |
-|------------|-------------------------------------------------------------------------|
-| Frontend   | React, Vite, Clerk, Stream Video/Chat SDK, React Resizable Panels      |
-| Backend    | Node.js, Express 5, Mongoose, Stream Chat, Inngest                     |
-| Database   | MongoDB (via Mongoose)                                                  |
-| Auth       | Clerk (frontend + backend middleware)                                   |
-| Code Exec  | Judge0 CE API                                                           |
-| Video/Chat | Stream (Video & Chat SDKs)                                              |
-| Styling    | DaisyUI / Tailwind CSS                                                  |
+- **Real-Time Video Calls** — Powered by Stream Video SDK for seamless pair-programming and collaborative problem-solving
+- **Live Code Editor** — Monaco-based editor with multi-language support via Judge0 CE API
+- **In-Session Chat** — Real-time messaging during collaborative sessions using Stream Chat SDK
+- **DSA Problem Library** — Built-in coding problems with difficulty levels, constraints, and examples
+- **Dashboard** — View active/recent sessions, stats cards, streak calendar, solved-problem progress, and create collaborative rooms
+- **Authentication** — Secure auth powered by Clerk with middleware-protected routes
+- **Event-Driven Architecture** — Inngest for background tasks like user sync and cleanup
+- **Resizable Panels** — Flexible session layout with draggable panels for code, video, problems, and chat
+- **Automatic Session Cleanup** — Background job that destroys stale, abandoned, or empty sessions
+- **Confetti Celebrations** — Canvas-confetti effects for successful code submissions
+- **Solved Progress Tracking** — Track your problem-solving progress across difficulty levels
 
 ---
 
-## 📁 Project Structure
+## Tech Stack
 
-```
-Hire_Verse/
-├── backend/
-│   ├── src/
-│   │   ├── controllers/
-│   │   │   ├── chatController.js      # Stream Chat token generation
-│   │   │   ├── codeController.js      # Code execution via Judge0 CE
-│   │   │   └── sessionController.js   # Session CRUD & management
-│   │   ├── lib/
-│   │   │   ├── db.js                  # MongoDB connection
-│   │   │   ├── env.js                 # Environment variable config
-│   │   │   ├── inngest.js             # Inngest event functions
-│   │   │   └── stream.js              # Stream Chat/Video client setup
-│   │   ├── middleware/
-│   │   │   └── authMiddleware.js      # Clerk auth middleware
-│   │   ├── modals/
-│   │   │   ├── Session.js             # Session mongoose model
-│   │   │   └── User.js               # User mongoose model
-│   │   ├── routes/
-│   │   │   ├── chatRoutes.js
-│   │   │   ├── codeRoutes.js
-│   │   │   └── sessionRoutes.js
-│   │   └── server.js                  # Express server entry point
-│   └── package.json
-├── frontend/
-│   ├── src/
-│   │   ├── api/
-│   │   │   └── session.js             # Session API calls
-│   │   ├── components/
-│   │   │   ├── ActiveSessions.jsx
-│   │   │   ├── CodeEditor.jsx
-│   │   │   ├── CreateSessionModel.jsx
-│   │   │   ├── DashNavbar.jsx
-│   │   │   ├── Footer.jsx
-│   │   │   ├── HeroSection.jsx
-│   │   │   ├── Navbar.jsx
-│   │   │   ├── OutputPanel.jsx
-│   │   │   ├── ProblemDescription.jsx
-│   │   │   ├── RecentSessions.jsx
-│   │   │   ├── StatsCards.jsx
-│   │   │   ├── VideoCallUi.jsx
-│   │   │   └── WelcomeSection.jsx
-│   │   ├── data/
-│   │   │   └── problem.js             # DSA problem definitions
-│   │   ├── hooks/
-│   │   │   ├── useSessions.js         # Session data hook
-│   │   │   └── useStreamClient.js     # Stream client hook
-│   │   ├── lib/
-│   │   │   ├── axios.js               # Axios instance config
-│   │   │   ├── piston.js              # Code execution helper
-│   │   │   ├── stream.js              # Stream client init
-│   │   │   └── utils.js               # Utility functions
-│   │   ├── pages/
-│   │   │   ├── Dashboard.jsx
-│   │   │   ├── HomePage.jsx
-│   │   │   ├── ProblemPage.jsx
-│   │   │   ├── ProblemsPage.jsx
-│   │   │   └── SessionPage.jsx
-│   │   ├── App.jsx
-│   │   ├── main.jsx
-│   │   └── index.css
-│   ├── index.html
-│   ├── vite.config.js
-│   └── package.json
-└── package.json                       # Root monorepo scripts
+| Layer      | Technology                                                                        |
+|------------|-----------------------------------------------------------------------------------|
+| Frontend   | React 19, Vite 7, Clerk, Stream Video/Chat SDK, Monaco Editor, Framer Motion     |
+| Backend    | Node.js, Express 5, Mongoose, Stream Chat, Inngest                                |
+| Database   | MongoDB (via Mongoose)                                                             |
+| Auth       | Clerk (frontend + backend middleware)                                              |
+| Code Exec  | Judge0 CE API                                                                      |
+| Video/Chat | Stream (Video & Chat SDKs)                                                         |
+| Styling    | Tailwind CSS 4 / DaisyUI 5                                                         |
+| State      | TanStack React Query                                                               |
+
+---
+
+## System Architecture
+
+```mermaid
+graph TB
+    subgraph Client["Frontend — React + Vite"]
+        UI["Pages & Components"]
+        ClerkFE["Clerk Auth (React SDK)"]
+        StreamFE["Stream Video & Chat SDK"]
+        Monaco["Monaco Code Editor"]
+        RQ["TanStack React Query"]
+    end
+
+    subgraph Server["Backend — Express 5 (Node.js)"]
+        API["REST API Routes"]
+        AuthMW["Clerk Auth Middleware"]
+        Controllers["Controllers"]
+        SessionCleanup["Session Cleanup Job"]
+        InngestFN["Inngest Functions"]
+    end
+
+    subgraph External["External Services"]
+        ClerkSvc["Clerk"]
+        StreamSvc["Stream (Video & Chat)"]
+        Judge0["Judge0 CE API"]
+        MongoDB["MongoDB"]
+        InngestSvc["Inngest"]
+    end
+
+    UI -->|API Calls via Axios| API
+    ClerkFE -->|Auth Tokens| ClerkSvc
+    StreamFE -->|Video & Chat| StreamSvc
+    Monaco -->|Code Submission| API
+    RQ -->|Data Fetching & Caching| API
+
+    API --> AuthMW
+    AuthMW -->|Verify JWT| ClerkSvc
+    AuthMW --> Controllers
+
+    Controllers -->|CRUD| MongoDB
+    Controllers -->|Execute Code| Judge0
+    Controllers -->|Chat Tokens| StreamSvc
+
+    SessionCleanup -->|Delete Stale Sessions| MongoDB
+    SessionCleanup -->|Destroy Calls & Channels| StreamSvc
+
+    InngestSvc -->|Clerk Webhooks| InngestFN
+    InngestFN -->|Sync/Delete Users| MongoDB
+    InngestFN -->|Upsert/Delete Stream Users| StreamSvc
 ```
 
+### Architecture Overview
+
+| Component | Responsibility |
+|-----------|----------------|
+| **React Frontend** | SPA with Clerk auth, Stream video/chat, Monaco editor, and TanStack Query for server-state management |
+| **Express Backend** | REST API with Clerk middleware, session/code/chat controllers, and Inngest webhook handlers |
+| **Inngest** | Event-driven functions that sync Clerk user lifecycle events (create/delete) to MongoDB & Stream |
+| **Session Cleanup** | Periodic background job (every 30s) that destroys sessions with no participants, disconnected users, or heartbeat timeouts |
+| **MongoDB** | Persistent store for User and Session models |
+| **Stream** | Real-time video calling and in-session messaging |
+| **Judge0 CE** | Sandboxed code execution engine supporting multiple programming languages |
+
 ---
 
-## ⚙️ Environment Variables
+## Environment Variables
 
 ### Backend (`backend/.env`)
 
@@ -127,7 +124,7 @@ VITE_STREAM_API_KEY=<your_stream_api_key>
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -173,7 +170,7 @@ npm run start    # Starts the backend (serves frontend in production)
 
 ---
 
-## 📡 API Endpoints
+## API Endpoints
 
 | Method | Endpoint                     | Description                       |
 |--------|------------------------------|-----------------------------------|
@@ -189,19 +186,19 @@ npm run start    # Starts the backend (serves frontend in production)
 
 ---
 
-## 🧩 Key Pages
+## Key Pages
 
 | Page            | Route             | Description                                                      |
 |-----------------|--------------------|------------------------------------------------------------------|
-| **Home**        | `/`                | Landing page with hero section                                   |
-| **Dashboard**   | `/dashboard`       | Manage sessions, view stats, create new rooms                    |
+| **Home**        | `/`                | Landing page with hero, features, how-it-works, stats, testimonials, and CTA sections |
+| **Dashboard**   | `/dashboard`       | Manage sessions, view stats, streak calendar, solved progress, create new rooms |
 | **Problems**    | `/problems`        | Browse DSA problems filtered by difficulty                       |
 | **Problem**     | `/problem/:id`     | View a specific problem's details, constraints, and examples     |
 | **Session**     | `/session/:id`     | Live interview room with video, code editor, chat, and problem   |
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
@@ -211,6 +208,6 @@ npm run start    # Starts the backend (serves frontend in production)
 
 ---
 
-## 📄 License
+## License
 
 This project is open source and available under the [MIT License](LICENSE).
