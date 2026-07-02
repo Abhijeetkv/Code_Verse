@@ -26,8 +26,8 @@ const Footer = () => {
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-4">
-              <img src={logo} alt="HireVerse" className="h-7 w-7" />
-              <span className="font-semibold text-white">HireVerse</span>
+              <img src={logo} alt="CodeVerse" className="h-7 w-7" />
+              <span className="font-semibold text-white">CodeVerse</span>
             </Link>
             <p className="text-sm leading-relaxed" style={{ color: 'var(--slate-500)' }}>
               Solve coding problems together with live video collaboration.
@@ -72,7 +72,7 @@ const Footer = () => {
         {/* Bottom */}
         <div className="flex flex-col sm:flex-row items-center justify-between pt-8" style={{ borderTop: '1px solid var(--slate-800)' }}>
           <p className="text-sm" style={{ color: 'var(--slate-500)' }}>
-            © 2026 HireVerse. All rights reserved.
+            © 2026 CodeVerse. All rights reserved.
           </p>
 
           <div className="flex items-center gap-3 mt-4 sm:mt-0">

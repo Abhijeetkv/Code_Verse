@@ -138,8 +138,8 @@ VITE_STREAM_API_KEY=<your_stream_api_key>
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/Hire_Verse.git
-cd Hire_Verse
+git clone https://github.com/your-username/Code_Verse.git
+cd Code_Verse
 
 # Install all dependencies (backend + frontend)
 npm run build

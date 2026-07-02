@@ -8,8 +8,8 @@ const Navbar = () => {
       <div className="max-w-6xl mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-2.5">
-            <img src={logo} alt="HireVerse" className="h-8 w-8" />
-            <span className="text-lg font-semibold text-white">HireVerse</span>
+            <img src={logo} alt="CodeVerse" className="h-8 w-8" />
+            <span className="text-lg font-semibold text-white">CodeVerse</span>
           </Link>
 
           <div className="hidden md:flex items-center gap-1">

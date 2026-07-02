@@ -3,7 +3,7 @@ import { Star } from "lucide-react";
 const TestimonialsSection = () => {
   const testimonials = [
     {
-      quote: "HireVerse makes pair programming so easy. I joined a session, solved a problem with a stranger, and learned a new approach — all in 20 minutes.",
+      quote: "CodeVerse makes pair programming so easy. I joined a session, solved a problem with a stranger, and learned a new approach — all in 20 minutes.",
       name: "Arjun Mehta",
       role: "Full-Stack Developer",
       company: "",

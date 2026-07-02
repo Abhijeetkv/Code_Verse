@@ -1,6 +1,6 @@
-# HireVerse — Frontend
+# CodeVerse — Frontend
 
-This folder contains the frontend SPA for HireVerse built with React and Vite. The app uses Clerk for authentication and expects a Clerk publishable key to be provided via Vite environment variables.
+This folder contains the frontend SPA for CodeVerse built with React and Vite. The app uses Clerk for authentication and expects a Clerk publishable key to be provided via Vite environment variables.
 
 ## Quick Overview
 - Framework: React (Vite)
@@ -42,14 +42,14 @@ Example (two terminals):
 
 Terminal 1 — Backend:
 ```powershell
-cd d:\HireVerse\backend
+cd d:\CodeVerse\backend
 npm install
 npm run dev
 ```
 
 Terminal 2 — Frontend:
 ```powershell
-cd d:\HireVerse\frontend
+cd d:\CodeVerse\frontend
 npm run dev
 ```
 

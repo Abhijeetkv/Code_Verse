@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
 
-const SOLVED_KEY = "hireverse_solved_problems";
-const SUBMISSIONS_KEY = "hireverse_submissions";
+const SOLVED_KEY = "codeverse_solved_problems";
+const SUBMISSIONS_KEY = "codeverse_submissions";
 
 function getToday() {
   return new Date().toISOString().split("T")[0];

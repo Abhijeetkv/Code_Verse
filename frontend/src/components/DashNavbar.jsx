@@ -27,7 +27,7 @@ const DashNavbar = () => {
                 className="text-xl pt-3 px-1 font-bold sm:text-2xl"
                 style={{ color: "var(--slate-100)" }}
               >
-                HireVerse
+                CodeVerse
               </p>
             </div>
           </Link>

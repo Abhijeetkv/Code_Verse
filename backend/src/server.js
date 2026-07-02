@@ -52,7 +52,7 @@ app.use("/api/sessions", sessionRoutes)
 app.use("/api/code", codeRoutes)
 
 app.get("/", (req, res) => {
-  res.send("Hello, HireVerse Backend!");
+  res.send("Hello, CodeVerse Backend!");
 });
 
 app.get("/api/test", (req, res) => {

@@ -15,7 +15,7 @@ const CTASection = () => {
           Ready to code with a partner?
         </h2>
         <p className="text-lg mb-10 max-w-xl mx-auto" style={{ color: 'var(--slate-400)' }}>
-          Join HireVerse and start solving problems together. 
+          Join CodeVerse and start solving problems together. 
           Practice DSA, join live sessions, and level up your skills — for free.
         </p>
 

@@ -3,7 +3,7 @@ import { connectDB } from "./db.js";
 import User from "../modals/User.js";
 import { deleteStreamUser, upsertStreamUser } from "./stream.js";
 
-export const inngest = new Inngest({ id: "hire_verse" });
+export const inngest = new Inngest({ id: "code_verse" });
 
 const syncUser = inngest.createFunction(
     {id:"sync-user"},
